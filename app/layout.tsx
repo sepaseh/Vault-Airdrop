@@ -1,22 +1,20 @@
 import type { Metadata } from "next";
 
-import "./globals.scss";
-
-// const inter = Inter({ subsets: ["latin"] });
+import "./styles/index.scss";
 
 export const metadata: Metadata = {
-  title: "Vault",
-  description: "Vault",
+	title: "Vault",
+	description: "Vault",
 };
 
 export default function RootLayout({
-  children,
+	children,
 }: Readonly<{
-  children: React.ReactNode;
+	children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en">
-      <body>{children}</body>
-    </html>
-  );
+	return (
+		<html lang="en">
+			<body>{children}</body>
+		</html>
+	);
 }
