@@ -1,6 +1,8 @@
 "use client";
 
 import { FC, useState } from "react";
+import { decodeContainer } from "@/proto/container";
+import { decodeVault } from "@/proto/vault";
 import { Upload, message } from "antd";
 import type { UploadFile, UploadProps } from "antd";
 import Image from "next/image";
@@ -9,6 +11,22 @@ const Component: FC = () => {
 	const [fileList, setFileList] = useState<UploadFile[]>([]);
 	//const [file] = fileList;
 
+	const parseVault = (base64String: string) => {
+		const bytes = Uint8Array.from(atob(base64String), (c) => c.charCodeAt(0));
+		const message = decodeVault(bytes);
+		console.table(message);
+	};
+
+	const parseContainer = (base64String: string) => {
+		const bytes = Uint8Array.from(atob(base64String), (c) => c.charCodeAt(0));
+		const message = decodeContainer(bytes);
+		console.table(message);
+
+		if (message.vault) {
+			parseVault(message.vault);
+		}
+	};
+
 	const props: UploadProps = {
 		multiple: false,
 		showUploadList: false,
@@ -16,9 +34,35 @@ const Component: FC = () => {
 			setFileList([]);
 		},
 		beforeUpload: (file) => {
-			setFileList([file]);
+			const reader = new FileReader();
 
-			message.success(`file "${file.name}" successfully selected.`);
+			reader.readAsDataURL(file);
+
+			reader.onload = () => {
+				message.success(`file "${file.name}" successfully selected.`);
+
+				setFileList([file]);
+
+				if (typeof reader.result === "string" && reader.result.startsWith("data:application/octet-stream;base64,")) {
+					const value = reader.result.replace(/^.+?;base64,/, "");
+
+					message.success(`file "${file.name}" successfully decoded.`);
+
+					setFileList([file]);
+
+					parseContainer(atob(value));
+				} else {
+					message.error(`the selected file is not valid`);
+
+					setFileList([]);
+				}
+			};
+
+			reader.onerror = (error) => {
+				console.log("Error: ", error);
+
+				setFileList([]);
+			};
 
 			return false;
 		},

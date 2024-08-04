@@ -1,20 +1,23 @@
 syntax = "proto3";
 
-import "google/protobuf/timestamp.proto";
-option go_package  = "/models";
+message Timestamp {
+  int64 seconds = 1;
+  int32 nanos = 2;
+}
+
+message KeyShare {
+    string public_key = 1;
+    string keyshare = 2;
+}
+
 message Vault {
     string name = 1;
     string public_key_ecdsa = 2;
     string public_key_eddsa = 3;
     repeated string signers = 4;
-    google.protobuf.Timestamp created_at = 5;
+    Timestamp created_at = 5;
     string hex_chain_code = 6;
     repeated KeyShare key_shares = 7;
     string local_party_id = 8;
     string reshare_prefix = 9;
-
-    message KeyShare {
-        string public_key = 1;
-        string keyshare = 2;
-    }
 }
